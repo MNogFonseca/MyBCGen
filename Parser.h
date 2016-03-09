@@ -47,6 +47,7 @@ class Parser {
 
     string nextLine();
     bool nextGate();
+    unsigned getBiggerSignal();
     
     vector<int>& getInputs() { return m_inputs; }
     unsigned&    getOutput() { return m_output; }

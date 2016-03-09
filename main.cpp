@@ -17,6 +17,8 @@ int main(int argc, char* argv[]) {
     ofstream cnfFile;
     cnfFile.open(string(file + ".cnf").c_str());
     cnfFile << "temp                            " << endl;
+    unsigned numGates = argc > 2 ? atoi(argv[2]) : 64;
+    Draw3CNFGates::newId = p.getBiggerSignal();
 
     p.nextGate();
     while(p.nextGate()) {
@@ -25,10 +27,10 @@ int main(int argc, char* argv[]) {
         GATE g = p.getGateType();
         switch(g) {
             case AND:
-                cnfFile << Draw3CNFGates::drawAnd(inputs, output);
+                cnfFile << Draw3CNFGates::drawAnd(inputs, output, numGates);
                 break;
             case OR:
-                cnfFile << Draw3CNFGates::drawOr(inputs, output);
+                cnfFile << Draw3CNFGates::drawOr(inputs, output, numGates);
                 break;
             case XOR:
                 cnfFile << Draw3CNFGates::xor3CNF(inputs[0], inputs[1], output);

@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include <stdlib.h>
+#include <iostream>
 
 string
 Parser::nextLine() {
@@ -30,6 +31,7 @@ Parser::nextGate() {
         int posF = gateInfo.find(')');
         m_numSignals = atoi(gateInfo.substr(posI+1, posF-posI-1).c_str());
     } else {
+
         int pos = gateInfo.find(' ');
         m_output = atoi(gateInfo.substr(0,pos).c_str());
         assert(m_output);
@@ -48,5 +50,25 @@ Parser::nextGate() {
         }
     }   
     return true;
-}   
+}
+
+unsigned
+Parser::getBiggerSignal() {
+    unsigned bigger = 0;
+    while(nextGate()) {
+        if (m_output > bigger) {
+            bigger = m_output;
+        }
+        for (vector<int>::const_iterator it = m_inputs.begin(); it != m_inputs.end(); ++it) {
+            if (*it > bigger) {
+                bigger = *it;
+            }
+        }
+    }
+    m_file.clear();
+    m_file.seekg(0,ios_base::beg);
+    m_numSignals = 0;
+    cout << bigger << endl;
+    return bigger;
+}
  
