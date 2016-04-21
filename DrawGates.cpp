@@ -19,17 +19,20 @@ Draw3CNFGates::countSig(const int& sig) {
 string
 Draw3CNFGates::andNCNF(const vector<int>& inputs, const int& out, unsigned& numGateInputs) {
     stringstream result;
-    result << out;
+    countSig(out);
+
     unsigned max = inputs.size() < numGateInputs ? inputs.size() : numGateInputs;
+    for (int i = 0; i < max; ++i) {
+        result << inputs[i] << " " << out*-1 << " 0\n";
+    }
+
+    result << out;
     for (int i = 0; i < max; ++i) {
         countSig(inputs[i]);
         result << " " << inputs[i]*-1;
     }
     result << " 0\n";
 
-    for (int i = 0; i < max; ++i) {
-        result << out*-1 << " " << inputs[i]<< " 0\n";
-    }
     numGates += 1 + max;
     return result.str();
 }
@@ -37,17 +40,20 @@ Draw3CNFGates::andNCNF(const vector<int>& inputs, const int& out, unsigned& numG
 string
 Draw3CNFGates::orNCNF(const vector<int>& inputs, const int& out, unsigned& numGateInputs) {
     stringstream result;
-    result << out*-1;
+    countSig(out);
     unsigned max = inputs.size() < numGateInputs ? inputs.size() : numGateInputs;
+
+    for (int i = 0; i < max; ++i) {
+        result << inputs[i]*-1 << " " << out << " 0\n";
+    }
+
+    result << out*-1;
     for (int i = 0; i < max; ++i) {
         countSig(inputs[i]);
         result << " " << inputs[i];
     }
     result << " 0\n";
 
-    for (int i = 0; i < max; ++i) {
-        result << out << " " << inputs[i]*-1<< " 0\n";
-    }
     numGates += 1 + max;
     return result.str();
 }
@@ -85,6 +91,14 @@ Draw3CNFGates::buffer(const int& in1, const int& out) {
     result << in1*-1 << " " << out << " 0\n";
     result << in1 << " " << out*-1 << " 0\n";
     numGates += 2;
+    return result.str();
+}
+string
+Draw3CNFGates::gnd(const int in1) {
+    countSig(in1);
+    stringstream result;
+    result << in1 << " 0\n";
+    numGates += 1;
     return result.str();
 }
 

@@ -1,6 +1,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -8,22 +9,29 @@
 #include "Parser.cpp"
 #include "DrawGates.cpp"
 
+#define FILTER_INV 0
 using namespace std;
-
 
 int main(int argc, char* argv[]) {
     string file = argv[1];
     Parser p(file);
     ofstream cnfFile;
-    cnfFile.open(string(file + ".cnf").c_str());
-    cnfFile << "temp                            " << endl;
-    unsigned numGates = argc > 2 ? atoi(argv[2]) : 64;
-    Draw3CNFGates::newId = p.getBiggerSignal();
+    unsigned numGates = argc > 2 ? atoi(argv[2]) : 10000;
+    unsigned maxLines = argc > 3 ? atoi(argv[3]) : 100000;
 
-    p.nextGate();
-    while(p.nextGate()) {
+    if (argc > 2) {
+        cnfFile.open(string(file + argv[2] + ".cnf").c_str());
+    } else {
+        cnfFile.open(string(file + ".cnf").c_str());
+    }
+    cnfFile << "temp                            " << endl;
+ 
+    Draw3CNFGates::newId = p.getBiggerSignal()+1;
+    while (!p.nextGate());
+    do { 
+        numGates = maxLines < p.getNumLine() ? 100000 : numGates;
         vector<int>& inputs = p.getInputs();
-        unsigned output = p.getOutput();
+        int output = p.getOutput();
         GATE g = p.getGateType();
         switch(g) {
             case AND:
@@ -42,13 +50,14 @@ int main(int argc, char* argv[]) {
                 cnfFile << Draw3CNFGates::buffer(inputs.back(), output);
                 break;
             default:
+                cout << p.getNumLine() << endl;
                 assert(0);
         }
-        
-    }
-    cnfFile << p.getNumSignals() << " 0" << endl;
+    } while (p.nextGate());
+    cnfFile << p.getDesignOutput() << " 0" << endl;
     cnfFile.seekp(ios_base::beg);
     cnfFile << "p cnf " << Draw3CNFGates::numSig << " " << Draw3CNFGates::numGates+1;
     cnfFile.close();
+
     return 1;
 }

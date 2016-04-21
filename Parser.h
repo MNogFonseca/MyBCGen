@@ -40,7 +40,7 @@ class Parser {
         , m_output()
         , m_inputs()
         , m_gate()
-        , m_numSignals(0)
+        , m_designOutput(0)
         , delimiters(" ,()")
         {}
     ~Parser() { m_file.close(); }
@@ -51,14 +51,26 @@ class Parser {
     
     vector<int>& getInputs() { return m_inputs; }
     unsigned&    getOutput() { return m_output; }
-    unsigned&    getNumSignals() { return m_numSignals; }
+    unsigned&    getNumLine()   { return m_line; }
+    unsigned&    getDesignOutput() { return m_designOutput; }
     GATE         getGateType() { return m_gate; }
+
+    void clearDesignInfo() {
+        m_inputs.clear();
+        m_output = 0;
+        m_gate = ERROR;
+    }
+    void rewind() {
+        m_file.clear();
+        m_file.seekg(0,ios_base::beg);
+        m_designOutput = 0;
+    }
 
   private:
     ifstream m_file;
     unsigned m_line;
     unsigned m_output;
-    unsigned m_numSignals;
+    unsigned m_designOutput;
     vector<int> m_inputs;
     GATE m_gate;
     string delimiters;

@@ -29,7 +29,9 @@ Parser::nextGate() {
     if (gateInfo[0] == 'O') {
         int posI = gateInfo.find('(');
         int posF = gateInfo.find(')');
-        m_numSignals = atoi(gateInfo.substr(posI+1, posF-posI-1).c_str());
+        m_designOutput = atoi(gateInfo.substr(posI+1, posF-posI-1).c_str());
+        clearDesignInfo();
+        return false;
     } else {
 
         int pos = gateInfo.find(' ');
@@ -55,7 +57,9 @@ Parser::nextGate() {
 unsigned
 Parser::getBiggerSignal() {
     unsigned bigger = 0;
-    while(nextGate()) {
+
+    while(!nextGate());
+    do {
         if (m_output > bigger) {
             bigger = m_output;
         }
@@ -64,11 +68,12 @@ Parser::getBiggerSignal() {
                 bigger = *it;
             }
         }
-    }
+    } while(nextGate());
     m_file.clear();
     m_file.seekg(0,ios_base::beg);
-    m_numSignals = 0;
-    cout << bigger << endl;
+    m_designOutput = 0;
+    m_gate = ERROR;
+    m_line = 0;
     return bigger;
 }
  
